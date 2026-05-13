@@ -1,0 +1,46 @@
+### IntelliJ IDEA ###
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+.kotlin
+.idea/
+    out/
+    *.class
+    ```
+3.  **Ahora sí, inicializa y sube:**
+    
+```bash
+    git init
+    git add .
+    git commit -m "Primer commit: Estructura inicial sistema gestión documental"
+    # Luego haces el remote add y el push que ya conoces
+    ```
+
+### ¿Por qué solo el `src` y `lib`?
+Porque el objetivo de un repositorio es compartir el **código fuente** y las **dependencias necesarias** para que el programa funcione. Todo lo que tu computadora genera automáticamente (como la carpeta `out`) o configuraciones personales (`.idea`) solo estorban cuando quieres clonar el proyecto en otro lugar.
+
+¿Ya tienes creado el nuevo repositorio en GitHub para este proyecto de "oficios" o quieres que te ayude a configurarlo desde cero?
+### Eclipse ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+
+### Mac OS ###
+.DS_Store
