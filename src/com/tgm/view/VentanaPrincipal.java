@@ -2,6 +2,7 @@ package com.tgm.view;
 import com.tgm.model.Oficio;
 import com.tgm.dao.OficioDAO;
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
@@ -55,6 +56,32 @@ public class VentanaPrincipal extends JFrame {
 
         //Refrescar
         btnRefrescar.addActionListener(e -> cargarDatos());
+
+        tablaOficios.getColumnModel().getColumn(3).setCellRenderer(new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                                                           boolean isSelected, boolean hasFocus, int row, int column) {
+                JLabel c = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                String estado = (String) value;
+
+                //Lógica de colores
+                if ("Borrador".equals(estado)) {
+                    c.setBackground(Color.LIGHT_GRAY);
+                    c.setForeground(Color.BLACK);
+                } else if ("En revisión".equals(estado)) {
+                    c.setBackground(Color.YELLOW);
+                    c.setForeground(Color.BLACK);
+                } else if ("Autorizado".equals(estado)) {
+                    c.setBackground(new Color(46, 204, 113));
+                    c.setForeground(Color.WHITE);
+                } else if ("Observado".equals(estado)) {
+                    c.setBackground(new Color(231, 76, 60));
+                    c.setForeground(Color.WHITE);
+                }
+                c.setOpaque(true);
+                return c;
+            }
+        });
     }
 
     private void cargarDatos() {
