@@ -27,16 +27,32 @@ public class VentanaPrincipal extends JFrame {
         panelMenu.setLayout(new GridLayout(10, 1, 10, 10));
 
         JButton btnNuevo = createMenuButton("Nuevo Oficio");
+        JButton btnRefrescar = createMenuButton("Actualizar Lista");
+        JButton btnRevisar = createMenuButton("Revisar oficio");
+
         btnNuevo.addActionListener(e -> {
             FormOficio form = new FormOficio(this);
             form.setVisible(true);
             cargarDatos();
         });
-        JButton btnRefrescar = createMenuButton("Actualizar Lista");
 
+        btnRevisar.addActionListener(e -> {
+            int fila = tablaOficios.getSelectedRow();
+            if (fila != -1) {
+                int idOficio = (int) modeloTabla.getValueAt(fila, 0);
+                //Llama al DAO
+                if (oficioDao.actualizarEstado(idOficio, 1, "En Revisión", "Se envía para visto bueno")) {
+                    JOptionPane.showMessageDialog(this, "Estado actualizado.");
+                    cargarDatos();
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Por favor, selecciona un oficio.");
+            }
+        });
         panelMenu.add(new JLabel(" TGM - TI "));
         panelMenu.add(btnNuevo);
         panelMenu.add(btnRefrescar);
+        panelMenu.add(btnRevisar);
         add(panelMenu, BorderLayout.WEST);
 
         //Tabla Central
@@ -57,27 +73,47 @@ public class VentanaPrincipal extends JFrame {
         //Refrescar
         btnRefrescar.addActionListener(e -> cargarDatos());
 
+        //Colores según el estado
         tablaOficios.getColumnModel().getColumn(3).setCellRenderer(new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value,
-                                                           boolean isSelected, boolean hasFocus, int row, int column) {
+                   boolean isSelected, boolean hasFocus, int row, int column) {
+
                 JLabel c = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                String estado = (String) value;
+                c.setHorizontalAlignment(SwingConstants.CENTER);
+                c.setFont(c.getFont().deriveFont(Font.BOLD));
+                String estado = (value != null) ? value.toString() : "";
 
                 //Lógica de colores
-                if ("Borrador".equals(estado)) {
-                    c.setBackground(Color.LIGHT_GRAY);
-                    c.setForeground(Color.BLACK);
-                } else if ("En revisión".equals(estado)) {
-                    c.setBackground(Color.YELLOW);
-                    c.setForeground(Color.BLACK);
-                } else if ("Autorizado".equals(estado)) {
-                    c.setBackground(new Color(46, 204, 113));
-                    c.setForeground(Color.WHITE);
-                } else if ("Observado".equals(estado)) {
-                    c.setBackground(new Color(231, 76, 60));
-                    c.setForeground(Color.WHITE);
+                switch (estado) {
+                    case "Borrador":
+                        c.setBackground(new Color(210, 215, 211));
+                        c.setForeground(Color.BLACK);
+                        break;
+                    case "En Revisión":
+                        c.setBackground(new Color(241, 196, 15));
+                        c.setForeground(Color.BLACK);
+                        break;
+                    case "Autorizado":
+                        c.setBackground(new Color(46, 204, 113));
+                        c.setForeground(Color.WHITE);
+                        break;
+                    case "Observado":
+                        c.setBackground(new Color(231, 76, 60));
+                        c.setForeground(Color.WHITE);
+                        break;
+                    default:
+                        c.setBackground(Color.WHITE);
+                        c.setForeground(Color.BLACK);
+                        break;
                 }
+
+                if (isSelected){
+                    c.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 2));
+                } else {
+                    c.setBorder(null);
+                }
+
                 c.setOpaque(true);
                 return c;
             }
@@ -92,7 +128,7 @@ public class VentanaPrincipal extends JFrame {
             modeloTabla.addRow(fila);
         }
     }
-
+    //Botones
     private JButton createMenuButton(String text) {
         JButton btn = new JButton(text);
         btn.setFocusPainted(false);
