@@ -26,6 +26,11 @@ public class VentanaPrincipal extends JFrame {
         panelMenu.setLayout(new GridLayout(10, 1, 10, 10));
 
         JButton btnNuevo = createMenuButton("Nuevo Oficio");
+        btnNuevo.addActionListener(e -> {
+            FormOficio form = new FormOficio(this);
+            form.setVisible(true);
+            cargarDatos();
+        });
         JButton btnRefrescar = createMenuButton("Actualizar Lista");
 
         panelMenu.add(new JLabel(" TGM - TI "));
@@ -56,7 +61,7 @@ public class VentanaPrincipal extends JFrame {
         modeloTabla.setRowCount(0); //Limpiar tabla
         List<Oficio> lista = oficioDao.consultarOficios();
         for (Oficio o : lista) {
-            Object[] fila = {o.getId(), o.getAsunto(), o.getEstado(), o.getIdCreador()};
+            Object[] fila = {o.getId(), o.getFolio(), o.getAsunto(), o.getEstado(), o.getIdCreador()};
             modeloTabla.addRow(fila);
         }
     }
