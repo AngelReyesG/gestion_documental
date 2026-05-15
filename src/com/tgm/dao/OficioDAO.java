@@ -125,4 +125,35 @@ public class OficioDAO {
                 }
             }
         }
+        //Búsqueda de oficios
+        public List <Oficio> buscarOficios(String criterio) {
+        List <Oficio> lista = new ArrayList<>();
+        //Busqueda de coincidencia en folio o asunto
+        String sql = "SELECT + FROM oficios WHERE folio LIKE ? OR asunto LIKE ? ORDER BY fecha_creacion DESC";
+
+        try (Connection con = ConexionDB.conectar();
+            PreparedStatement ps = con.prepareStatement(sql)) {
+
+            String busqueda = "%" + criterio + "%";
+            ps.setString(1, busqueda);
+            ps.setString(2, busqueda);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Oficio oficio = new Oficio(
+                            rs.getString("folio"),
+                            rs.getString("asunto"),
+                            rs.getString("cuerpo"),
+                            rs.getInt("id_creador")
+                    );
+                    oficio.setId(rs.getInt("id_oficio"));
+                    oficio.setEstado(rs.getString("estado"));
+                    lista.add(oficio);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error en búsqueda: " + e.getMessage());
+        }
+        return lista;
+        }
     }

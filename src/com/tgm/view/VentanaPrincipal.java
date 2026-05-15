@@ -19,6 +19,23 @@ public class VentanaPrincipal extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
+        //Campo de superior búsqueda
+        JTextField txtBuscador = new JTextField(20);
+        txtBuscador.setPreferredSize(new Dimension(300,30));
+
+        //Panel Superior
+        JPanel panelNorte = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panelNorte.add(new JLabel("Buscar por Folio o Asunto:"));
+        panelNorte.add(txtBuscador);
+        add(panelNorte, BorderLayout.NORTH);
+
+        txtBuscador.addKeyListener(new java.awt.event.KeyAdapter() {
+            @Override
+            public void keyReleased(java.awt.event.KeyEvent e) {
+                String criterio = txtBuscador.getText();
+                actualizarTablaBusqueda(criterio);
+            }
+        });
 
         //Panel Lateral
         JPanel panelMenu = new JPanel();
@@ -120,6 +137,15 @@ public class VentanaPrincipal extends JFrame {
         });
     }
 
+    //Metodo para actualizar tabla de búsqueda
+    private void actualizarTablaBusqueda(String criterio) {
+        modeloTabla.setRowCount(0);
+        List<Oficio> resultados = oficioDao.buscarOficios(criterio);
+        for (Oficio o : resultados) {
+            Object[] fila = {o.getId(), o.getFolio(), o.getAsunto(), o.getEstado(), o.getIdCreador()};
+            modeloTabla.addRow(fila);
+        }
+    }
     private void cargarDatos() {
         modeloTabla.setRowCount(0); //Limpiar tabla
         List<Oficio> lista = oficioDao.consultarOficios();
