@@ -129,7 +129,7 @@ public class OficioDAO {
         public List <Oficio> buscarOficios(String criterio) {
         List <Oficio> lista = new ArrayList<>();
         //Busqueda de coincidencia en folio o asunto
-        String sql = "SELECT + FROM oficios WHERE folio LIKE ? OR asunto LIKE ? ORDER BY fecha_creacion DESC";
+        String sql = "SELECT * FROM oficios WHERE folio LIKE ? OR asunto LIKE ? ORDER BY fecha_creacion DESC";
 
         try (Connection con = ConexionDB.conectar();
             PreparedStatement ps = con.prepareStatement(sql)) {
