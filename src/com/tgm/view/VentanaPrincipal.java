@@ -1,6 +1,8 @@
 package com.tgm.view;
 import com.tgm.model.Oficio;
 import com.tgm.dao.OficioDAO;
+import com.tgm.service.ReporteGenerador;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -146,12 +148,41 @@ public class VentanaPrincipal extends JFrame {
             modeloTabla.addRow(fila);
         }
     }
+
+    //Metodo para cargar datos de registro
     private void cargarDatos() {
         modeloTabla.setRowCount(0); //Limpiar tabla
         List<Oficio> lista = oficioDao.consultarOficios();
         for (Oficio o : lista) {
             Object[] fila = {o.getId(), o.getFolio(), o.getAsunto(), o.getEstado(), o.getIdCreador()};
             modeloTabla.addRow(fila);
+        }
+    }
+
+    //Metodo para exportar a PDF
+    private void btnExportarPdfActionPerformed() {
+        int fila = tablaOficios.getSelectedRow();
+        if (fila == -1) {
+            JOptionPane.showMessageDialog(this, "Selecciona un oficio de la tabla");
+            return;
+        }
+
+        Oficio seleccionado = listaOficios.get(fila);
+        JFileChooser selector = new JFileChooser();
+        selector.setDialogTitle("Guardar Oficio como PDF");
+
+        if (selector.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+            String ruta = selector.getSelectedFile().getAbsolutePath();
+
+            if (!ruta.endsWith(".pdf")) {
+                ruta += ".pdf";
+            }
+
+            //Llamar al generador
+            ReporteGenerador generador = new ReporteGenerador();
+            generador.generarPdfOficio(seleccionado, ruta);
+
+            JOptionPane.showMessageDialog(this, "Documento generado correctamente.");
         }
     }
     //Botones
