@@ -156,4 +156,30 @@ public class OficioDAO {
         }
         return lista;
         }
+
+        public Oficio consultarOficioPorId(int idOficio) {
+            Oficio oficio = null;
+            String sql = "SELECT * FROM oficios WHERE id_oficio = ?";
+
+            try (Connection con = ConexionDB.conectar();
+                PreparedStatement ps = con.prepareStatement(sql)) {
+
+                ps.setInt(1, idOficio);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        oficio = new Oficio(
+                                rs.getString("folio"),
+                                rs.getString("asunto"),
+                                rs.getString("cuerpo"),
+                                rs.getInt("id_creador")
+                        );
+                        oficio.setId(rs.getInt("id_oficio"));
+                        oficio.setEstado(rs.getString("estado"));
+                    }
+                }
+            } catch (SQLException e) {
+                System.out.println("Error al consultar oficio por ID: " + e.getMessage());
+            }
+            return oficio;
+        }
     }

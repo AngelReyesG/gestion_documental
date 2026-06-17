@@ -48,13 +48,14 @@ public class VentanaPrincipal extends JFrame {
         JButton btnNuevo = createMenuButton("Nuevo Oficio");
         JButton btnRefrescar = createMenuButton("Actualizar Lista");
         JButton btnRevisar = createMenuButton("Revisar oficio");
+        JButton btnExportar = createMenuButton("Exportar a PDF");
 
+        btnExportar.addActionListener(e -> btnExportarPdfActionPerformed());
         btnNuevo.addActionListener(e -> {
             FormOficio form = new FormOficio(this);
             form.setVisible(true);
             cargarDatos();
         });
-
         btnRevisar.addActionListener(e -> {
             int fila = tablaOficios.getSelectedRow();
             if (fila != -1) {
@@ -72,6 +73,7 @@ public class VentanaPrincipal extends JFrame {
         panelMenu.add(btnNuevo);
         panelMenu.add(btnRefrescar);
         panelMenu.add(btnRevisar);
+        panelMenu.add(btnExportar);
         add(panelMenu, BorderLayout.WEST);
 
         //Tabla Central
@@ -150,24 +152,21 @@ public class VentanaPrincipal extends JFrame {
     }
 
     //Metodo para cargar datos de registro
-    private void cargarDatos() {
-        modeloTabla.setRowCount(0); //Limpiar tabla
-        List<Oficio> lista = oficioDao.consultarOficios();
-        for (Oficio o : lista) {
-            Object[] fila = {o.getId(), o.getFolio(), o.getAsunto(), o.getEstado(), o.getIdCreador()};
-            modeloTabla.addRow(fila);
-        }
-    }
-
-    //Metodo para exportar a PDF
     private void btnExportarPdfActionPerformed() {
         int fila = tablaOficios.getSelectedRow();
         if (fila == -1) {
             JOptionPane.showMessageDialog(this, "Selecciona un oficio de la tabla");
             return;
         }
+        //Obtener ID del oficio
+        int idOficio = (int) modeloTabla.getValueAt(fila, 0);
+        Oficio seleccionado = oficioDao.consultarOficioPorId(idOficio);
 
-        Oficio seleccionado = listaOficios.get(fila);
+        if (seleccionado == null) {
+            JOptionPane.showMessageDialog(this,"Error al recuperar los datos del oficio.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        //Configuración de guardado de archivo
         JFileChooser selector = new JFileChooser();
         selector.setDialogTitle("Guardar Oficio como PDF");
 
@@ -177,14 +176,23 @@ public class VentanaPrincipal extends JFrame {
             if (!ruta.endsWith(".pdf")) {
                 ruta += ".pdf";
             }
-
-            //Llamar al generador
+            //Llamamos servicios para construir PDF
             ReporteGenerador generador = new ReporteGenerador();
             generador.generarPdfOficio(seleccionado, ruta);
 
-            JOptionPane.showMessageDialog(this, "Documento generado correctamente.");
+            JOptionPane.showMessageDialog(this, "Docuento generado correctamente");
         }
     }
+
+    private void cargarDatos() {
+        modeloTabla.setRowCount(0); //Limpiar tabla
+        List<Oficio> lista = oficioDao.consultarOficios();
+        for (Oficio o : lista) {
+            Object[] fila = {o.getId(), o.getFolio(), o.getAsunto(), o.getEstado(), o.getIdCreador()};
+            modeloTabla.addRow(fila);
+        }
+    }
+
     //Botones
     private JButton createMenuButton(String text) {
         JButton btn = new JButton(text);
